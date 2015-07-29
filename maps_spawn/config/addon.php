@@ -1,7 +1,7 @@
 <?php
 return array(
 	'MenuItems' => array(
-		'Database' => array(
+		'DatabaseLabel' => array(
 			'Maps Database' => array('module' => 'map'),
 			'Mob Database (new)' => array('module' => 'monster_new'),
 		),
