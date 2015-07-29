@@ -19,7 +19,7 @@
             </tr>
             <?php foreach($mobs as $mob){ ?>
                 <tr>
-                    <td><a href="<?=$this->url('monster_new', 'view')?>&id=<?=$mob->mob_id?>"><?=$mob->mob_name ? $mob->mob_name : $mob->mob_name_2?></td>
+                    <td><a href="<?=$this->url('monster_new', 'view')?>&id=<?=$mob->mob_id?>"><?=$mob->name?></td>
                     <td><?=$mob->count?></td>
                     <td><b><?=ceil($mob->time_to / 60000)?></b>min<?=
                         ($mob->time_from ?

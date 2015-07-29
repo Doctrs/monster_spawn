@@ -17,24 +17,24 @@ foreach($data as $key => &$item){
         unset($data[$key]);
         continue;
     }
-    $item = preg_replace("/\t(boss_)?monster\t(.*?)\t/", ',', $item);
+    $item = preg_replace("/\t(boss_)?monster\t(.*?)\t/", ',$2,', $item);
 }unset($item);
 
-$sql = 'insert into mob_spawns (`map`, `x`, `y`, `range_x`, `range_y`, `mob_id`, `count`, `time_to`, `time_from`)values';
+$sql = 'insert into mob_spawns (`map`, `x`, `y`, `range_x`, `range_y`, `name`, `mob_id`, `count`, `time_to`, `time_from`)values';
 $array = array();
 $insert = array();
 foreach($data as $item){
     $import = explode(',', $item);
-    if(sizeof($import) > 9){
-        $import = array_slice($import, 0, 9);
+    if(sizeof($import) > 10){
+        $import = array_slice($import, 0, 10);
     }
     if(sizeof($import) < 9){
-        for($i = sizeof($import) ; $i < 9 ; $i ++){
+        for($i = sizeof($import) ; $i < 10 ; $i ++){
             $import[$i] = 0;
         }
     }
     $array = array_merge($array, $import);
-    $insert[] = '(?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    $insert[] = '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 }
 if(sizeof($insert)) {
     $sql .= join(',', $insert);

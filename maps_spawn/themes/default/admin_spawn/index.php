@@ -102,17 +102,6 @@
     </script>
 <?php } ?>
 
-<h3>Base Configuration</h3>
-<form class="forms" method="post" enctype="multipart/form-data">
-    Renewal/Pre-Renewal<br>
-    <input type="hidden" name="setConfig" value="1">
-    <select class="btn" name="renewal">
-        <option value="REN" <?=$MAIN_CONFIG['renewal'] == 'REN' ? 'selected' : ''?>>Renewal</option>
-        <option value="PRE" <?=$MAIN_CONFIG['renewal'] == 'PRE' ? 'selected' : ''?>>Pre-Renewal</option>
-    </select>
-    <input class="btn" type="submit">
-</form>
-
 <div class="loading"><img src="/addons/maps_spawn/themes/default/admin_spawn/load.gif"> Загружаю . . .</div>
 <table class="table">
 </table>

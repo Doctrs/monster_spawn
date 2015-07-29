@@ -1,19 +1,9 @@
 <?php
 if (!defined('FLUX_ROOT')) exit;
 require __DIR__ . '/../../mapImage.php';
-require __DIR__ . '/../../config.php';
-error_reporting(0);
-
-$RENEVAL = ($MAIN_CONFIG['renewal'] == 'REN');
-$mob_db = 'mob_db' . ($RENEVAL ? '_re' : '');
-$mob_db2 = 'mob_db2' . ($RENEVAL ? '_re' : '');
-$item_db = 'item_db' . ($RENEVAL ? '_re' : '');
-$item_db2 = 'item_db2' . ($RENEVAL ? '_re' : '');
-
 
 $title = 'Viewing Monster';
 $mobID = $params->get('id');
-
 
 /* MOB SPAWN */
 try {

@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS `mob_spawns` (
   `range_y` smallint(4) NOT NULL,
   `mob_id` smallint(5) NOT NULL,
   `count` smallint(4) NOT NULL,
+  `name` varchar(40) NOT NULL,
   `time_to` int(11) NOT NULL,
   `time_from` int(11) NOT NULL,
   PRIMARY KEY (`id`),
@@ -49,24 +50,6 @@ CREATE TABLE IF NOT EXISTS `map_index` (
             break;
     }
 }
-
-if($params->get('setConfig')){
-    $MAIN_CONFIG = array(
-        'renewal' => null
-    );
-
-    foreach($MAIN_CONFIG as $key => $item){
-        $val = $params->get($key);
-        if(isset($val)){
-            $MAIN_CONFIG[$key] = $val;
-        }
-    }
-    $conf = var_export($MAIN_CONFIG, true);
-    $cache = '<?php $MAIN_CONFIG = ' . $conf . ';';
-
-    $t = file_put_contents(__DIR__ . '/../../config.php', $cache);
-}
-require __DIR__ . '/../../config.php';
 
 if($files->get('map_index')) {
     $tmp = $files->get('map_index')->get('tmp_name');
