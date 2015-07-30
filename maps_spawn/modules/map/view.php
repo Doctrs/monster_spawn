@@ -6,21 +6,21 @@ error_reporting(0);
 $title = 'Map Database';
 
 try {
-    $sth = $server->connection->getStatement('select name from `map_index` where name = ?');
+    $sth = $server->connection->getStatement('select * from `map_index` where name = ?');
     $sth->execute(array($params->get('map')));
     if((int)$sth->stmt->errorCode()){
         throw new Flux_Error('db not found');
     }
-    $map = $sth->fetch();
+    $map = $sth->fetchAll();
+    $map = $map[0];
 } catch(Exception $e){
     $map = false;
 }
 if($map){
-    $map = $map->name;
     try {
-        $sql = 'select *, SUM(count) as count from `mob_spawns` where map = ? group by mob_id';
+        $sql = 'select * from `mob_spawns` where map = ?';
         $sth = $server->connection->getStatement($sql);
-        $sth->execute(array($params->get('map')));
+        $sth->execute(array($map->name));
         if((int)$sth->stmt->errorCode()){
             throw new Flux_Error('db not found');
         }
@@ -28,4 +28,8 @@ if($map){
     } catch(Exception $e){
         $mobs = array();
     }
+}
+
+function conv($point, $size){
+    return 512 / ($size / $point);
 }

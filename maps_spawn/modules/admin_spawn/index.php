@@ -35,6 +35,8 @@ CREATE TABLE IF NOT EXISTS `mob_spawns` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 CREATE TABLE IF NOT EXISTS `map_index` (
   `name` varchar(20) NOT NULL,
+  `x` smallint(4) NOT NULL,
+  `y` smallint(4) NOT NULL,
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 ');
@@ -53,30 +55,53 @@ CREATE TABLE IF NOT EXISTS `map_index` (
 
 if($files->get('map_index')) {
     $tmp = $files->get('map_index')->get('tmp_name');
-    $maps = explode("\n", file_get_contents($tmp));
-    $sql  = 'insert into map_index (`name`)values';
-    $insert = array();
-    $data = array();
-    foreach($maps as $map){
-        $map = trim($map);
-        if(!$map){
-            continue;
+    $array_insert = array();
+
+    $data = file_get_contents($tmp);
+    $array = array(
+        array('A12', 12),
+        array('S', 2),
+        array('S', 2),
+        array('L', 4),
+    );
+
+    $count = 0;
+    $i = 8;
+    while($i < strlen($data)){
+        $byte = '';
+        for($k = $i ; $k < $i + $array[$count][1] ; $k++){
+            $byte .= $data[$k];
         }
-        if(substr($map, 0, 2) == '//'){
-            continue;
+        $datas = unpack($array[$count][0], $byte);
+        if($count != 3) {
+            $array_insert[] = $datas[1];
         }
-        $insert[] = '(?)';
-        $data[] = $map;
+        $i += $array[$count][1];
+        $count ++;
+        if(!isset($array[$count])) {
+            $count = 0;
+            $i += $datas[1];
+        }
     }
-    if(sizeof($insert)) {
-        try {
-            $sql .= join(',', $insert);
-            $sth = $server->connection->getStatement($sql);
-            $sth->execute($data);
-            $successMessage = 'Maps successfully added to database. Total maps - ' . sizeof($data);
-        } catch(Exception $e){
-            $errorMessage = $e->getMessage();
-        }
+
+    if(sizeof($array_insert) % 3 != 0){
+        $errorMessage = 'File map_cache.dat not validate';
+        return;
+    }
+    $rows = sizeof($array_insert) / 3;
+    $sql  = 'insert into map_index (`name`, `x`, `y`)values';
+    $insert = array();
+    for($i = 0 ; $i < $rows ; $i ++){
+        $insert[] = '(?, ?, ?)';
+    }
+
+    try {
+        $sql .= join(',', $insert);
+        $sth = $server->connection->getStatement($sql);
+        $sth->execute($array_insert);
+        $successMessage = 'Maps successfully added to database. Total maps - ' . ($rows);
+    } catch(Exception $e){
+        $errorMessage = $e->getMessage();
     }
 }
 
