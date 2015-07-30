@@ -3,7 +3,7 @@
     <p class="red"><?php echo htmlspecialchars($errorMessage) ?></p>
 <?php endif ?>
 <?php if (!empty($successMessage)): ?>
-<p class="green"><?php echo htmlspecialchars($successMessage) ?></p>
+    <p class="green"><?php echo htmlspecialchars($successMessage) ?></p>
 <?php endif ?>
 <h2>Tables with monsters spawn and maps</h2>
 

@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS `map_index` (
   `name` varchar(20) NOT NULL,
   `x` smallint(4) NOT NULL,
   `y` smallint(4) NOT NULL,
+  `cell_data` text NOT NULL,
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 ');
@@ -79,26 +80,44 @@ if($files->get('map_index')) {
         $i += $array[$count][1];
         $count ++;
         if(!isset($array[$count])) {
+
+            $byte = '';
+            for($k = $i ; $k < $i + $datas[1] ; $k++){
+                $byte .= $data[$k];
+            }
+
+            $uncompress = ($byte);
+            $array_insert[] = $uncompress;
+            /*$str = '';
+            for($u = 0 ; $u < strlen($uncompress); $u ++) {
+                $cells = (unpack('C', $uncompress[$u]));
+                $str .= $cells[1];
+            }
+            $array_insert[] = gzcompress($str);*/
+
             $count = 0;
             $i += $datas[1];
         }
     }
 
-    if(sizeof($array_insert) % 3 != 0){
+    if(sizeof($array_insert) % 4 != 0){
         $errorMessage = 'File map_cache.dat not validate';
         return;
     }
-    $rows = sizeof($array_insert) / 3;
-    $sql  = 'insert into map_index (`name`, `x`, `y`)values';
+    $rows = sizeof($array_insert) / 4;
+    $sql  = 'insert into map_index (`name`, `x`, `y`, `cell_data`)values';
     $insert = array();
     for($i = 0 ; $i < $rows ; $i ++){
-        $insert[] = '(?, ?, ?)';
+        $insert[] = '(?, ?, ?, ?)';
     }
 
     try {
         $sql .= join(',', $insert);
         $sth = $server->connection->getStatement($sql);
         $sth->execute($array_insert);
+        if((int)$sth->stmt->errorCode()){
+            throw new Flux_Error('db not found');
+        }
         $successMessage = 'Maps successfully added to database. Total maps - ' . ($rows);
     } catch(Exception $e){
         $errorMessage = $e->getMessage();
