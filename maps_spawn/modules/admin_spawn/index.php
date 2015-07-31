@@ -88,13 +88,6 @@ if($files->get('map_index')) {
 
             $uncompress = ($byte);
             $array_insert[] = $uncompress;
-            /*$str = '';
-            for($u = 0 ; $u < strlen($uncompress); $u ++) {
-                $cells = (unpack('C', $uncompress[$u]));
-                $str .= $cells[1];
-            }
-            $array_insert[] = gzcompress($str);*/
-
             $count = 0;
             $i += $datas[1];
         }

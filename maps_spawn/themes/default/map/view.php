@@ -14,40 +14,25 @@
 <h2>Map Database</h2>
 <a style="display:block;" href="<?=$this->url('map')?>">Back to Map Database</a>
 
-<?php if($map){ var_dump($map);?>
+<?php if($map){?>
+<?php if($map->cell_data){ ?>
 <script>
     $(document).ready(function() {
         var canvas = document.getElementById("canvas");
         var ctx = canvas.getContext("2d");
-
-
         canvas.width = 512;
         canvas.height = 512;
-
-
-        var background = new Image();
-        background.src = '<?=mapImage($map->name)?>';
-
-        // Make sure the image is loaded first otherwise nothing will draw.
-        background.onload = function () {
-            //ctx.drawImage(background, 0, 0);
-        };
         <?php for($i = 0 ; $i < strlen($map->cell_data) ; $i ++) {
-        if(!$map->cell_data[$i]){
-            echo 'ctx.fillStyle = "#999";';
+        $color = $map->cell_data[$i];
+        if($color == 0 || $color > 1 && $color < 9){
+            echo 'ctx.globalAlpha=1;ctx.fillStyle = "#' . $color . '9' . $color . '9' . $color . '9";';
+        } elseif($color == 9){
+            echo 'ctx.globalAlpha=0;';
         } else {
-            echo 'ctx.fillStyle = "#191919";';
+            echo 'ctx.globalAlpha=1;ctx.fillStyle = "#999";';
         }
-
         ?>
-
-        ctx.fillRect(
-            <?=conv($i % $map->x, $map->x)?>,
-            <?=512 - conv(ceil($i / $map->y), $map->y)?>,
-            <?=(conv(1, $map->x))?>,
-            <?=(conv(1, $map->y))?>
-        );
-
+        ctx.fillRect(<?=conv($i % $map->x, $map->x)?>,<?=512 - conv(ceil($i / $map->y), $map->y)?>,<?=(conv(1, $map->x))?>, <?=(conv(1, $map->y))?>);
         <?php } if(!mapImage($map->name)){ ?>
         $.ajax({
             type: "POST",
@@ -64,6 +49,7 @@
     });
 
 </script>
+<?php } ?>
 
 
 <table style="display:inline-block" class="vertical-table" style="margin-top:10px;">
@@ -71,8 +57,7 @@
         <td>
             <h3>Map "<b><?=$map->name?></b>"</h3>
             <div style="background-image: url(<?=mapImage($map->name)?>);display:inline-block;position:relative;width:512px;height:512px">
-                <canvas id="canvas" style="width:100%;height:100%"></canvas>
-                <!--img src="<?=mapImage($map->name)?>" style="width:100%;height:100%;"-->
+                <canvas id="canvas"></canvas>
 
                 <?php $isResp = false; foreach($mobs as $mob){ if(!$mob->x){continue;} $isResp = true; ?>
 
