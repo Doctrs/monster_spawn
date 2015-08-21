@@ -8,7 +8,7 @@
 
 <style>
     .points{position:absolute;border:3px double #ff00ff;}
-    .points_npcs{position:absolute;width:10px;height:10px;background-color: green;border:3px solid #ffff00}
+    .points_npcs{z-index:5999;position:absolute;width:10px;height:10px;background-color: green;border:3px solid #ffff00}
     .hide{display:none;}
     .you_here{z-index:9999;position:absolute;width:10px;height:10px;background-color: green;border:2px solid yellow;border-radius:20px;}
     .warps:hover{border-color:black;cursor:pointer;background-color: #ff443f  }
@@ -66,16 +66,16 @@
                 <?php foreach($npsc as $npc){?>
 
                     <div class="npc_<?=$npc->x?>-<?=$npc->y?> points_npcs hide npc_resp" style="
-                        left:<?=conv($npc->x, $map->x, $map)?>px;
-                        bottom:<?=conv($npc->y, $map->y, $map)?>px;
+                        left:<?=conv($npc->x, $map->x, $map) - 5?>px;
+                        bottom:<?=conv($npc->y, $map->y, $map) - 5?>px;
                         "></div>
 
                 <?php } ?>
                 <?php foreach($shops as $shop){?>
 
                     <div class="npc_<?=$shop->x?>-<?=$shop->y?> points_npcs hide npc_resp" style="
-                        left:<?=conv($shop->x, $map->x, $map)?>px;
-                        bottom:<?=conv($shop->y, $map->y, $map)?>px;
+                        left:<?=conv($shop->x, $map->x, $map) - 5?>px;
+                        bottom:<?=conv($shop->y, $map->y, $map) - 5?>px;
                         "></div>
 
                 <?php } ?>
