@@ -17,6 +17,7 @@ try {
 } catch(Exception $e){
 	$mobSpawn = false;
 }
+/* MOB SPAWN */
 
 require_once 'Flux/TemporaryTable.php';
 

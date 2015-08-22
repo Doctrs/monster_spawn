@@ -24,29 +24,32 @@ if($params->get('act')){
         case 'create':
             $sth = $server->connection->getStatement('
 CREATE TABLE IF NOT EXISTS `warps` (
-`id` int(11) NOT NULL,
+`id` int(11) NOT NULL AUTO_INCREMENT,
   `map` varchar(20) NOT NULL,
   `x` smallint(4) NOT NULL,
   `y` smallint(4) NOT NULL,
   `to` varchar(20) NOT NULL,
   `tx` smallint(4) NOT NULL,
-  `ty` smallint(4) NOT NULL
+  `ty` smallint(4) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 CREATE TABLE IF NOT EXISTS `npsc` (
-`id` int(11) NOT NULL,
+`id` int(11) NOT NULL AUTO_INCREMENT,
   `map` varchar(20) NOT NULL,
   `x` smallint(4) NOT NULL,
   `y` smallint(4) NOT NULL,
   `name` varchar(30) NOT NULL,
-  `sprite` smallint(4) NOT NULL
+  `sprite` smallint(4) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE IF NOT EXISTS `shops` (
-`id` int(11) NOT NULL,
+`id` int(11) NOT NULL AUTO_INCREMENT,
   `map` varchar(20) NOT NULL,
   `x` smallint(4) NOT NULL,
   `y` smallint(4) NOT NULL,
   `name` varchar(30) NOT NULL,
-  `sprite` smallint(4) NOT NULL
+  `sprite` smallint(4) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE IF NOT EXISTS `mob_spawns` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -111,7 +114,7 @@ if($files->get('map_index')) {
         }
         $datas = unpack($array[$count][0], $byte);
         if($count != 3) {
-            $array_insert[] = $datas[1];
+            $array_insert[] = trim($datas[1]);
         }
         $i += $array[$count][1];
         $count ++;
