@@ -10,6 +10,10 @@ return array(
 			'index' => AccountLevel::ANYONE,
 			'view' => AccountLevel::ANYONE,
 		),
+		'npcs' => array(
+			'index' => AccountLevel::ANYONE,
+			'view' => AccountLevel::ANYONE,
+		),
 		'monster_new' => array(
 			'index' => AccountLevel::ANYONE,
 			'view' => AccountLevel::ANYONE

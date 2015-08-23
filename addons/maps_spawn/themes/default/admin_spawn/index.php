@@ -13,7 +13,7 @@
     <b id="monNum"><?=$MobSpawnBase?></b> Mobs in database
 <?php } ?><br>
 <?php if($npcsBase === false){ ?>
-    Not found table `npsc`
+    Not found table `npcs`
 <?php } else { ?>
     <b id="npcNum"><?=$npcsBase?></b> NPCs in database
 <?php } ?><br>
@@ -114,12 +114,12 @@
                                 'File <b>' + data.file_short + '</b> successfly load. </td>' +
                                 '<td>Mobs: <b>' + data.data.mobs + '</b>, </td>' +
                                 '<td>Warps: <b>' + data.data.warps + '</b>, </td>' +
-                            '<td>NPCs: <b>' + data.data.npsc + '</b></td>' +
+                            '<td>NPCs: <b>' + data.data.npcs + '</b></td>' +
                             '<td>Shops: <b>' + data.data.shops + '</b></td>' +
                             '</tr>');
                             $('#monNum').text(parseInt($('#monNum').text()) + data.data.mobs);
                             $('#warpNum').text(parseInt($('#warpNum').text()) + data.data.warps);
-                            $('#npcNum').text(parseInt($('#npcNum').text()) + data.data.npsc);
+                            $('#npcNum').text(parseInt($('#npcNum').text()) + data.data.npcs);
                             $('#shopNum').text(parseInt($('#shopNum').text()) + data.data.shops);
                         }
                         COUNT++;

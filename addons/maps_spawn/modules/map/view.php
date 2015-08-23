@@ -4,6 +4,23 @@ require __DIR__ . '/../../mapImage.php';
 error_reporting(0);
 
 $title = 'Map Database';
+if($params->get('npc_id')){
+    $sth = $server->connection->getStatement('select * from `shops_sells` where id_shop = ?');
+    $sth->execute(array($params->get('npc_id')));
+    $items = $sth->fetchAll();
+    $json = array();
+    foreach($items as $item){
+        $img = $this->iconImage($item->item);
+        $json[] = array(
+            'id' => $item->item,
+            'img' => $img ? $img : '',
+            'name' => $item->name,
+            'price' => preg_replace('/(\d)(?=(\d\d\d)+([^\d]|$))/', '$1 ', $item->price)
+        );
+    }
+    echo json_encode($json);
+    die();
+}
 
 try {
     $sth = $server->connection->getStatement('select * from `map_index` where name = ?');
@@ -20,7 +37,7 @@ if($map){
     $tables = array(
         'mob_spawns' => 'mobs',
         'warps' => 'warps',
-        'npsc' => 'npsc',
+        'npcs' => 'npcs',
         'shops' => 'shops'
     );
     foreach($tables as $table => $var) {
@@ -36,16 +53,4 @@ if($map){
             $$var = array();
         }
     }
-}
-
-function conv($point, $size, $map = false){
-    if($map) {
-        $max = max($map->x, $map->y);
-        if($size != $max){
-            $point += ($max - $size) / 2;
-        }
-    } else {
-        $max = $size;
-    }
-    return 512 / ($max / $point);
 }

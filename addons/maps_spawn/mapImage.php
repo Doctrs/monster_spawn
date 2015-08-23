@@ -11,3 +11,14 @@ function npcImage($id)
     $path = FLUX_ROOT . '/' . $link;
     return file_exists($path) ? $link : false;
 }
+function conv($point, $size, $map = false, $map_image = 512){
+    if($map) {
+        $max = max($map->x, $map->y);
+        if($size != $max){
+            $point += ($max - $size) / 2;
+        }
+    } else {
+        $max = $size;
+    }
+    return $map_image / ($max / $point);
+}

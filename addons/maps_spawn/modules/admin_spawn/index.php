@@ -13,8 +13,8 @@ if($params->get('act')){
                 truncate table `mob_spawns`;
                 truncate table `map_index`;
                 truncate table `warps`;
-                truncate table `npsc`;
-                truncate table `shops`;
+                truncate table `npcs`;
+                truncate table `shops_sells`;
                 ');
                 $sth->execute();
             } catch(Exception $e){}
@@ -33,24 +33,27 @@ CREATE TABLE IF NOT EXISTS `warps` (
   `ty` smallint(4) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
-CREATE TABLE IF NOT EXISTS `npsc` (
+
+CREATE TABLE IF NOT EXISTS `shops_sells` (
+  `id_shop` int(11) NOT NULL,
+  `item` int(11) NOT NULL,
+  `price` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+ALTER TABLE `shops_sells`
+ ADD KEY `id_shop` (`id_shop`);
+
+CREATE TABLE IF NOT EXISTS `npcs` (
 `id` int(11) NOT NULL AUTO_INCREMENT,
   `map` varchar(20) NOT NULL,
   `x` smallint(4) NOT NULL,
   `y` smallint(4) NOT NULL,
   `name` varchar(30) NOT NULL,
   `sprite` smallint(4) NOT NULL,
+  `is_shop` tinyint(2) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-CREATE TABLE IF NOT EXISTS `shops` (
-`id` int(11) NOT NULL AUTO_INCREMENT,
-  `map` varchar(20) NOT NULL,
-  `x` smallint(4) NOT NULL,
-  `y` smallint(4) NOT NULL,
-  `name` varchar(30) NOT NULL,
-  `sprite` smallint(4) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 CREATE TABLE IF NOT EXISTS `mob_spawns` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `map` varchar(20) NOT NULL,
@@ -67,6 +70,7 @@ CREATE TABLE IF NOT EXISTS `mob_spawns` (
   KEY `map` (`map`),
   KEY `mob_id` (`mob_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
 CREATE TABLE IF NOT EXISTS `map_index` (
   `name` varchar(20) NOT NULL,
   `x` smallint(4) NOT NULL,
@@ -80,11 +84,11 @@ CREATE TABLE IF NOT EXISTS `map_index` (
         case 'delete':
             try {
                 $sth = $server->connection->getStatement('
-                drop table `mob_spawns`;
-                drop table `map_index`;
-                drop table `warps`;
-                drop table `npsc`;
-                drop table `shops`;
+                drop table if exists `mob_spawns`;
+                drop table if exists `map_index`;
+                drop table if exists `warps`;
+                drop table if exists `npcs`;
+                drop table if exists `shops_sells`;
                 ');
                 $sth->execute();
             } catch(Exception $e){}
@@ -168,10 +172,29 @@ if($files->get('npc_zip')) {
 $tables = array(
     'mob_spawns' => 'MobSpawnBase',
     'map_index' => 'mapIndexBase',
-    'npsc' => 'npcsBase',
-    'warps' => 'warpsBase',
-    'shops' => 'shopsBase'
+    'warps' => 'warpsBase'
 );
+
+try {
+    $sth = $server->connection->getStatement('select count(*) as count from `npcs` where is_shop = 0');
+    $sth->execute();
+    $npcsBase = $sth->fetch()->count;
+    if ($npcsBase === false || $npcsBase === null) {
+        throw new Flux_Error('db not found');
+    }
+} catch (Exception $e) {
+    $npcsBase = false;
+}
+try {
+    $sth = $server->connection->getStatement('select count(*) as count from `npcs` where is_shop = 1');
+    $sth->execute();
+    $shopsBase = $sth->fetch()->count;
+    if ($shopsBase === false || $shopsBase === null) {
+        throw new Flux_Error('db not found');
+    }
+} catch (Exception $e) {
+    $shopsBase = false;
+}
 
 foreach($tables as $table => $var) {
     try {
