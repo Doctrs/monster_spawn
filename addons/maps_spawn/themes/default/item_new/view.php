@@ -216,6 +216,35 @@
 	<?php endforeach ?>
 </table>
 <?php endif ?>
+
+
+	<!-- ITEM SHOP -->
+	<?php if($itemShop !== false): ?>
+		<h3><?=$item->name?> Buyable At</h3>
+		<?php if(sizeof($itemShop)): ?>
+			<table class="vertical-table">
+    <tr>
+        <th>Name</th>
+        <th>Map</th>
+        <th>Coordinates</th>
+        <th>Sell Price</th>
+    </tr>
+    <?php foreach($itemShop as $it){ ?>
+        <tr>
+            <td><a href="<?=$this->url('npcs', 'view')?>&id=<?=$it->id?>"><?=$it->name?></a></td>
+            <td><a href="<?=$this->url('map', 'view')?>&map=<?=$it->map?>"><?=$it->map?></a></td>
+            <td><?=$it->x?>,<?=$it->y?></td>
+            <td><?=$it->price?></td>
+        </tr>
+    <?php } ?>
+			</table>
+		<?php else: ?>
+			This item can not be bought
+		<?php endif ?>
+	<?php endif ?>
+	<!-- ITEM SHOP -->
+
+
 <?php else: ?>
 <p>No such item was found. <a href="javascript:history.go(-1)">Go back</a>.</p>
 <?php endif ?>

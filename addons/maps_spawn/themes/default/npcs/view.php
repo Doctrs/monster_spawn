@@ -47,7 +47,7 @@
             <td><?php $img = $this->iconImage($item->item); if($img){
                     echo '<img src="' . $img . '">';
                 }?></td>
-            <td><?=$item->name?></td>
+            <td><a href="<?=$this->url('item_new', 'view')?>&id=<?=$item->item?>"><?=$item->name?></td>
             <td><?=$item->price?></td>
         </tr>
     <?php } ?>

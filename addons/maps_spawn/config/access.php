@@ -18,5 +18,12 @@ return array(
 			'index' => AccountLevel::ANYONE,
 			'view' => AccountLevel::ANYONE
 		),
+		'item_new' => array(
+			'index' => AccountLevel::ANYONE,
+			'view' => AccountLevel::ANYONE,
+			'add' => AccountLevel::ADMIN,
+			'edit' => AccountLevel::ADMIN,
+			'copy' => AccountLevel::ADMIN
+		),
 	),
 );
