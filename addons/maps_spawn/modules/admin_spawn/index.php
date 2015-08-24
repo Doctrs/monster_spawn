@@ -106,7 +106,7 @@ if($files->get('map_index')) {
     $map_cache = FLUX_ROOT . '/map_cache.dat';
     $is_loaded = $flieLoad->load($files->get('map_index'), $map_cache);
     if($is_loaded === true) {
-        if(mime_content_type($map_cache) != 'application/octet-stream'){
+        if(function_exists('mime_content_type') && mime_content_type($map_cache) != 'application/octet-stream'){
             $errorMessage = 'File is not map_cache.dat';
         } else {
 
