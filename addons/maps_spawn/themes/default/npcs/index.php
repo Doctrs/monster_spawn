@@ -15,7 +15,7 @@
             <tr>
                 <td align="right">
                     <?php if ($auth->actionAllowed('npcs', 'view')): ?>
-                        <?php echo '<a href="' . $this->url('npcs', 'view') . '&id=' . $npc->id . '">' . htmlspecialchars($npc->name) . '</a>' ?>
+                        <?php echo '<a href="' . $this->url('npcs', 'view', array('id' => $npc->id)) . '">' . htmlspecialchars($npc->name) . '</a>' ?>
                     <?php else: ?>
                         <?php echo htmlspecialchars($npc->name) ?>
                     <?php endif ?>
@@ -30,7 +30,14 @@
                 if($m){
                     echo 'title="<img src=\'' . $m . '\'>"';
                 }
-                ?>><a href="<?=$this->url('map', 'view')?>&map=<?=$npc->map?>"><?php echo htmlspecialchars($npc->map) ?></td>
+                ?>>
+
+                    <?php if($auth->actionAllowed('map', 'view')){ ?>
+                        <a href="<?=$this->url('map', 'view', array('map' => $npc->map))?>"><?php echo htmlspecialchars($npc->map) ?></a>
+                    <?php } else { ?>
+                        <?php echo htmlspecialchars($npc->map) ?>
+                    <?php } ?>
+                    </td>
                 <td><?=number_format($npc->x) ?>,<?=number_format($npc->y) ?></td>
                 <td><?=$npc->is_shop ? 'Shop' : ''?></td>
             </tr>

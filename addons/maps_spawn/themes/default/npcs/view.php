@@ -10,7 +10,11 @@
     </tr>
     <tr>
         <th>Map</th>
-        <td><a href="<?=$this->url('map', 'view')?>&map=<?=$npc->map?>"><?=$npc->map?></a></td>
+        <?php if($auth->actionAllowed('map', 'view')){ ?>
+            <td><a href="<?=$this->url('map', 'view', array('map' => $npc->map))?>"><?=$npc->map?></a></td>
+        <?php } else { ?>
+            <td><?=$npc->map?></td>
+        <?php } ?>
     </tr>
     <tr>
         <th>Coordinates</th>
@@ -47,7 +51,12 @@
             <td><?php $img = $this->iconImage($item->item); if($img){
                     echo '<img src="' . $img . '">';
                 }?></td>
-            <td><a href="<?=$this->url('item_new', 'view')?>&id=<?=$item->item?>"><?=$item->name?></td>
+
+            <?php if($auth->actionAllowed('item_new', 'view')){ ?>
+                <td><a href="<?=$this->url('item_new', 'view', array('id' => $item->item))?>"><?=$item->name?></a></td>
+            <?php } else { ?>
+                <td><?=$item->name?></td>
+            <?php } ?>
             <td><?=$item->price?></td>
         </tr>
     <?php } ?>

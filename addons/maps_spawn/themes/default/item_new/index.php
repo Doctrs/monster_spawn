@@ -162,7 +162,7 @@
 	<tr>
 		<td align="right">
 			<?php if ($auth->actionAllowed('item_new', 'view')): ?>
-				<?php echo '<a href="' . $this->url('item_new', 'view') . '&id=' . $item->item_id . '">' .
+				<?php echo '<a href="' . $this->url('item_new', 'view', array('id' => $item->item_id)) . '">' .
 					htmlspecialchars($item->item_id) . '</a>'?>
 			<?php else: ?>
 				<?php echo htmlspecialchars($item->item_id) ?>

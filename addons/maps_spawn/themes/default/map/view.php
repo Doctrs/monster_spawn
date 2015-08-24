@@ -29,6 +29,45 @@
 </style>
 <script>
     $(document).ready(function(){
+        $('.hide_shop').on('click', function(){
+            id = $(this).attr('data');
+            $('.shop_' + id).toggleClass('hide');
+        });
+        $('.show_shop').on('click', function(){
+            id = $(this).attr('data');
+            $('#load_shop_' + id).show();
+            $.ajax({
+                type: 'GET',
+                dataType: 'JSON',
+                url: '/?module=map&action=view&npc_id=' + id,
+                success: function(data){
+                    $('.shop_' + id).toggleClass('hide');
+                    $('#load_shop_' + id).hide();
+                    if(!data.length){
+                        $('#shop_' + id).text('Not found items in this shop.');
+                    } else{
+                        var table = '<table class="vertical-table"><tr><th>Image</th><th>Name</th><th>Price</th></tr>';
+                        for(var i in data){
+                            var item = data[i];
+                            table += '<tr>';
+                            table += '<td>' + item.img + '</td>';
+                            if(item.link){
+                                table += '<td><a href="' + item.link + '">' + item.name + '</a></td>';
+                            } else {
+                                table += '<td>' + item.name + '</td>';
+                            }
+                            table += '<td>' + item.price + '</td>';
+                        }
+                        $('#shop_' + id).html(table);
+                    }
+                    console.log(data);
+                },
+                error: function(){
+                    $('#load_shop_' + id).hide();
+                    alert('Error with loading items');
+                }
+            })
+        });
         $('.npcs_hover').hover(function(){
             $('.' + $(this).attr('data')).show();
         }, function(){
@@ -63,7 +102,7 @@
                         "></div>
                 <?php } ?>
 
-                <?php foreach($npsc as $npc){?>
+                <?php foreach($npcs as $npc){?>
 
                     <div class="npc_<?=$npc->x?>-<?=$npc->y?> points_npcs hide npc_resp" style="
                         left:<?=conv($npc->x, $map->x, $map) - 5?>px;
@@ -94,7 +133,7 @@
 
                 <?php foreach($warps as $warp){?>
 
-                    <a href="<?=$this->url('map', 'view')?>&map=<?=$warp->to?>&x=<?=$warp->tx?>&y=<?=$warp->ty?>">
+                    <a href="<?=$this->url('map', 'view', array('map' => $warp->to, 'x' => $warp->tx, 'y' => $warp->ty))?>">
                     <div class="warps" style="
                         left:<?=conv($warp->x, $map->x, $map) - 10?>px;
                         bottom:<?=conv($warp->y, $map->y, $map) - 10?>px;
@@ -131,7 +170,11 @@
                         <?php foreach($mobs as $mob){ ?>
 
                             <tr>
-                                <td><a href="<?=$this->url('monster_new', 'view')?>&id=<?=$mob->mob_id?>"><?=$mob->name?></td>
+                                <?php if($auth->actionAllowed('monster_new', 'view')){ ?>
+                                    <td><a href="<?=$this->url('monster_new', 'view', array('id' => $mob->mob_id))?>"><?=$mob->name?></td>
+                                <?php } else { ?>
+                                    <td><?=$mob->name?></td>
+                                <?php } ?>
                                 <td><?=$mob->count?></td>
                                 <td><b><?=ceil($mob->time_to / 60000)?></b>min<?=
                                     ($mob->time_from ?
@@ -160,17 +203,21 @@
             </div>
 
             <div id="npcs_table" class="tabs_un" style="display:none;">
-                <?php if(sizeof($npsc)){ ?>
-                    <table style="max-height: 500px;overflow: auto;display:inline-block" class="vertical-table" style="margin-top:10px;">
+                <?php if(sizeof($npcs)){ ?>
+                    <table style="margin-top:10px; max-height: 500px;overflow: auto;display:inline-block" class="vertical-table">
                         <tr>
                             <th>NPC Name</th>
                             <th>Image</th>
                             <th>Coordinates</th>
                         </tr>
                         <tbody>
-                        <?php foreach($npsc as $npc){?>
+                        <?php foreach($npcs as $npc){?>
                             <tr class="npcs_hover" data="npc_<?=$npc->x?>-<?=$npc->y?>">
-                                <td><?=$npc->name?></td>
+                                <?php if($auth->actionAllowed('npcs', 'view')){ ?>
+                                    <td><a href="<?=$this->url('npcs', 'view', array('id' => $npc->id))?>"><?=$npc->name?></td>
+                                <?php } else { ?>
+                                    <td><?=$npc->name?></td>
+                                <?php } ?>
                                 <td><img src="<?=npcImage($npc->sprite)?>" /></td>
                                 <td><?=$npc->x . ',' . $npc->y?></td>
                             </tr>
@@ -181,14 +228,14 @@
 
                 <?php }else{ ?>
 
-                    No NPSc on this map.
+                    No NPCs on this map.
 
                 <?php } ?>
             </div>
 
             <div id="shops_table" class="tabs_un" style="display:none;">
                 <?php if(sizeof($shops)){ ?>
-                    <table style="max-height: 500px;overflow: auto;display:inline-block" class="vertical-table" style="margin-top:10px;">
+                    <table style="margin-top:10px;max-height: 500px;overflow: auto;display:inline-block" class="vertical-table">
                         <tr>
                             <th>Shop Name</th>
                             <th>Image</th>
@@ -197,9 +244,22 @@
                         <tbody>
                         <?php foreach($shops as $shop){?>
                             <tr class="npcs_hover" data="npc_<?=$shop->x?>-<?=$shop->y?>">
-                                <td><?=$shop->name?></td>
+                                <?php if($auth->actionAllowed('npcs', 'view')){ ?>
+                                    <td><a href="<?=$this->url('npcs', 'view', array('id' => $shop->id))?>"><?=$shop->name?></td>
+                                <?php } else { ?>
+                                    <td><?=$shop->name?></td>
+                                <?php } ?>
                                 <td><img src="<?=npcImage($shop->sprite)?>" /></td>
                                 <td><?=$shop->x . ',' . $shop->y?></td>
+                            </tr>
+                            <tr class="npcs_hover" data="npc_<?=$shop->x?>-<?=$shop->y?>">
+                                <td colspan="3" align="center">
+                                    <input type="button" data="<?=$shop->id?>" class="show_shop shop_<?=$shop->id?>" value="show" />
+                                    <input type="button" data="<?=$shop->id?>" class="hide_shop shop_<?=$shop->id?> hide" value="hide" />
+                                    <br>
+                                    <img src="/addons/maps_spawn/themes/default/admin_spawn/load.gif" id="load_shop_<?=$shop->id?>" class="shop_<?=$shop->id?> hide">
+                                    <div class="shop_<?=$shop->id?> hide" id="shop_<?=$shop->id?>"></div>
+                                </td>
                             </tr>
                         <?php } ?>
                         </tbody>

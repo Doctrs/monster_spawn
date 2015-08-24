@@ -13,6 +13,7 @@ if($params->get('npc_id')){
         $img = $this->iconImage($item->item);
         $json[] = array(
             'id' => $item->item,
+            'link' => $auth->actionAllowed('item_new', 'view') ? $this->url('item_new', 'view', array('id' => $item->item)) : '',
             'img' => $img ? $img : '',
             'name' => $item->name,
             'price' => preg_replace('/(\d)(?=(\d\d\d)+([^\d]|$))/', '$1 ', $item->price)
@@ -35,14 +36,14 @@ try {
 }
 if($map){
     $tables = array(
-        'mob_spawns' => 'mobs',
-        'warps' => 'warps',
-        'npcs' => 'npcs',
-        'shops' => 'shops'
+        '`mob_spawns` where map = ?' => 'mobs',
+        '`warps` where map = ?' => 'warps',
+        '`npcs` where map = ? and is_shop = 0' => 'npcs',
+        '`npcs` where map = ? and is_shop = 1' => 'shops'
     );
     foreach($tables as $table => $var) {
         try {
-            $sql = 'select * from `' . $table . '` where map = ?';
+            $sql = 'select * from ' . $table;
             $sth = $server->connection->getStatement($sql);
             $sth->execute(array($map->name));
             if ((int)$sth->stmt->errorCode()) {

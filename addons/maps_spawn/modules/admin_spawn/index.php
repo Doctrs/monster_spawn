@@ -1,7 +1,9 @@
 <?php
 if (!defined('FLUX_ROOT')) exit;
 require __DIR__ . '/parse.php';
+require __DIR__ . '/../../mapImage.php';
 error_reporting(0);
+ini_set("display_errors", 1);
 
 $title = 'Spawn Monsters';
 
@@ -97,108 +99,109 @@ CREATE TABLE IF NOT EXISTS `map_index` (
     }
 }
 
+$flieLoad = new FileLoad();
+
+// upload and parse map.
 if($files->get('map_index')) {
-    $tmp = $files->get('map_index')->get('tmp_name');
-    $array_insert = array();
+    $map_cache = FLUX_ROOT . '/map_cache.dat';
+    $is_loaded = $flieLoad->load($files->get('map_index'), $map_cache);
+    if($is_loaded === true) {
+        if(mime_content_type($map_cache) != 'application/octet-stream'){
+            $errorMessage = 'File is not map_cache.dat';
+        } else {
 
-    $data = file_get_contents($tmp);
-    $array = array(
-        array('A12', 12),
-        array('S', 2),
-        array('S', 2),
-        array('L', 4),
-    );
+            $array_insert = array();
+            $data = file_get_contents($map_cache);
 
-    $count = 0;
-    $i = 8;
-    while($i < strlen($data)){
-        $byte = '';
-        for($k = $i ; $k < $i + $array[$count][1] ; $k++){
-            $byte .= $data[$k];
-        }
-        $datas = unpack($array[$count][0], $byte);
-        if($count != 3) {
-            $array_insert[] = trim($datas[1]);
-        }
-        $i += $array[$count][1];
-        $count ++;
-        if(!isset($array[$count])) {
+            $array = array(
+                array('A12', 12),
+                array('S', 2),
+                array('S', 2),
+                array('L', 4),
+            );
+
             $count = 0;
-            $i += $datas[1];
-        }
-    }
+            $i = 8;
+            while ($i < strlen($data)) {
+                $byte = '';
+                for ($k = $i; $k < $i + $array[$count][1]; $k++) {
+                    $byte .= $data[$k];
+                }
+                $datas = unpack($array[$count][0], $byte);
+                if ($count != 3) {
+                    $array_insert[] = trim($datas[1]);
+                }
+                $i += $array[$count][1];
+                $count++;
+                if (!isset($array[$count])) {
+                    $count = 0;
+                    $i += $datas[1];
+                }
+            }
 
-    if(sizeof($array_insert) % 3 == 0) {
-        $rows = sizeof($array_insert) / 3;
-        $sql = 'insert into map_index (`name`, `x`, `y`)values';
-        $insert = array();
-        for ($i = 0; $i < $rows; $i++) {
-            $insert[] = '(?, ?, ?)';
-        }
+            if (sizeof($array_insert) % 3 == 0) {
+                $rows = sizeof($array_insert) / 3;
+                $sql = 'insert into map_index (`name`, `x`, `y`)values';
+                $insert = array();
+                for ($i = 0; $i < $rows; $i++) {
+                    $insert[] = '(?, ?, ?)';
+                }
 
-        try {
-            $sql .= join(',', $insert);
-            $sth = $server->connection->getStatement($sql);
-            $sth->execute($array_insert);
-            $successMessage = 'Maps successfully added to database. Total maps - ' . ($rows);
-        } catch (Exception $e) {
-            $errorMessage = $e->getMessage();
+                try {
+                    $sql .= join(',', $insert);
+                    $sth = $server->connection->getStatement($sql);
+                    $sth->execute($array_insert);
+                    $successMessage = 'Maps successfully added to database. Total maps - ' . ($rows);
+                } catch (Exception $e) {
+                    $errorMessage = $e->getMessage();
+                }
+            } else {
+                $errorMessage = 'File map_cache.dat not validate';
+            }
         }
+        $flieLoad->delete();
     } else {
-        $errorMessage = 'File map_cache.dat not validate';
+        $errorMessage = $is_loaded;
     }
 }
 
+// upload and parse all npcs.
 if($files->get('npc_zip')) {
-    if($files->get('npc_zip')->get('error')){
-        $errorMessage = 'The uploaded file exceeds the upload_max_filesize directive in php.ini';
-    } else {
+    $npc_zip = FLUX_ROOT . '/npc_zip.zip';
+    $is_loaded = $flieLoad->load($files->get('npc_zip'), $npc_zip);
+    if($is_loaded === true) {
         $dirExtract = FLUX_ROOT . '/upload_npc';
         $zip = new ZipArchive;
-        if ($zip->open($files->get('npc_zip')->get('tmp_name')) === true) {
+        if ($zip->open($npc_zip) === true) {
             $zip->extractTo($dirExtract);
             $zip->close();
             $parse = new parse($server);
             $file = $parse->getFiles();
+            $successMessage = 'Successfull load ' . sizeof($file) . ' files';
         } else {
             $errorMessage = 'file must be ZIP ARCHIVE';
         }
         if (sizeof($file) == 0) {
             $errorMessage = 'files in the archive not found';
         }
+        $flieLoad->delete();
+    } else {
+        $errorMessage = $is_loaded;
     }
 }
 
+// get data from tables
 $tables = array(
-    'mob_spawns' => 'MobSpawnBase',
-    'map_index' => 'mapIndexBase',
-    'warps' => 'warpsBase'
+    '`mob_spawns`' => 'MobSpawnBase',
+    '`map_index`' => 'mapIndexBase',
+    '`warps`' => 'warpsBase',
+    '`npcs` where is_shop = 0' => 'npcsBase',
+    '`npcs` where is_shop = 1' => 'shopsBase'
 );
-
-try {
-    $sth = $server->connection->getStatement('select count(*) as count from `npcs` where is_shop = 0');
-    $sth->execute();
-    $npcsBase = $sth->fetch()->count;
-    if ($npcsBase === false || $npcsBase === null) {
-        throw new Flux_Error('db not found');
-    }
-} catch (Exception $e) {
-    $npcsBase = false;
-}
-try {
-    $sth = $server->connection->getStatement('select count(*) as count from `npcs` where is_shop = 1');
-    $sth->execute();
-    $shopsBase = $sth->fetch()->count;
-    if ($shopsBase === false || $shopsBase === null) {
-        throw new Flux_Error('db not found');
-    }
-} catch (Exception $e) {
-    $shopsBase = false;
-}
 
 foreach($tables as $table => $var) {
     try {
-        $sth = $server->connection->getStatement('select count(*) as count from `' . $table . '`');
+        $sth = $server->connection->getStatement('select count(*) as count from ' . $table);
         $sth->execute();
         $$var = $sth->fetch()->count;
         if ($$var === false || $$var === null) {

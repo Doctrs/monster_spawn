@@ -4,9 +4,8 @@ require __DIR__ . '/../../mapImage.php';
 error_reporting(0);
 
 $title = 'Map Database';
-
 try {
-    $sth = $server->connection->getStatement('select name from `map_index` order by name');
+    $sth = $server->connection->getStatement('select * from `map_index` order by name');
     $sth->execute();
     if((int)$sth->stmt->errorCode()){
         throw new Flux_Error('db not found');

@@ -231,8 +231,16 @@
     </tr>
     <?php foreach($itemShop as $it){ ?>
         <tr>
-            <td><a href="<?=$this->url('npcs', 'view')?>&id=<?=$it->id?>"><?=$it->name?></a></td>
-            <td><a href="<?=$this->url('map', 'view')?>&map=<?=$it->map?>"><?=$it->map?></a></td>
+			<?php if($auth->actionAllowed('npcs', 'view')){ ?>
+            	<td><a href="<?=$this->url('npcs', 'view', array('id' => $it->id))?>"><?=$it->name?></a></td>
+			<?php } else { ?>
+				<td><?=$it->name?></td>
+			<?php } ?>
+			<?php if($auth->actionAllowed('map', 'view')){ ?>
+            	<td><a href="<?=$this->url('map', 'view', array('map' => $it->map))?>"><?=$it->map?></a></td>
+			<?php } else { ?>
+				<td><?=$it->map?></td>
+			<?php } ?>
             <td><?=$it->x?>,<?=$it->y?></td>
             <td><?=$it->price?></td>
         </tr>

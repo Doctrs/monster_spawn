@@ -1,4 +1,5 @@
 <?php
+
 return array(
 	'MenuItems' => array(
 		'DatabaseLabel' => array(

@@ -27,16 +27,20 @@
 <h2>Map Database</h2>
 <?php if($maps !== false){ ?>
 <h3>Quick Map Links</h3>
-Filter <input type="text" id="filtering">
-    <div style="margin:10px;border:1px solid lightgray;padding:20px;height:500px;overflow: auto">
-        <table>
+Filter <input type="text" id="filtering" style="display: block;">
+    <div style="margin:10px;border:1px solid lightgray;padding:20px;height:500px;overflow: auto;display: inline-block;">
+        <table class="vertical-table">
             <tr id="notFound" style="<?=sizeof($maps)?'display:none;':''?>"><td>
     No area found
 </td></tr>
-        <?php foreach($maps as $map){ ?>
+        <?php foreach($maps as $map){ $img = mapImage($map->name, true); ?>
             <tr class="maps" id="<?=$map->name?>">
-                <td><img height="30" width="30" src="<?=mapImage($map->name, true)?>"></td>
-                <td style="padding-left:20px;"><a href="<?=$this->url('map', 'view')?>&map=<?=$map->name?>"><?=$map->name?></td>
+                <td <?=$img ? 'title="<img src=\'' . $img . '\'>"' : ''?>><img height="30" width="30" src="<?=$img ? $img : ''?>"></td>
+			<?php if($auth->actionAllowed('map', 'view')){ ?>
+                <td style="padding-left:20px;"><a href="<?=$this->url('map', 'view', array('map' => $map->name))?>"><?=$map->name?></a> (<?=$map->x?>x<?=$map->y?>)</td>
+            <?php } else { ?>
+                <td style="padding-left:20px;"><?=$map->name?> (<?=$map->x?>x<?=$map->y?>)</td>
+            <?php } ?>
             </tr>
         <?php } ?>
         </div>

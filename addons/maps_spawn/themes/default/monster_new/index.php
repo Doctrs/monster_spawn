@@ -49,7 +49,7 @@
 	<tr>
 		<td align="right">
 			<?php if ($auth->actionAllowed('monster_new', 'view')): ?>
-				<?php echo '<a href="' . $this->url('monster_new', 'view') . '&id=' . $monster->monster_id . '">' . htmlspecialchars($monster->monster_id) . '</a>' ?>
+				<?php echo '<a href="' . $this->url('monster_new', 'view', array('id' => $monster->monster_id)) . '">' . htmlspecialchars($monster->monster_id) . '</a>' ?>
 			<?php else: ?>
 				<?php echo htmlspecialchars($monster->monster_id) ?>
 			<?php endif ?>
