@@ -50,7 +50,11 @@
                         for(var i in data){
                             var item = data[i];
                             table += '<tr>';
-                            table += '<td>' + item.img + '</td>';
+                            if(item.img) {
+                                table += '<td><img src="' + item.img + '" /></td>';
+                            } else {
+                                table += '<td></td>';
+                            }
                             if(item.link){
                                 table += '<td><a href="' + item.link + '">' + item.name + '</a></td>';
                             } else {
