@@ -63,8 +63,8 @@
 		<td><?php echo htmlspecialchars($monster->iro_name) ?></td>
 		<td><?php echo number_format($monster->level) ?></td>
 		<td><?php echo number_format($monster->hp) ?></td>
-		<td><?php echo number_format($monster->exp * $server->baseExpRates) ?></td>
-		<td><?php echo number_format($monster->jexp * $server->jobExpRates) ?></td>
+		<td><?php echo number_format($monster->exp * $server->expRates['Base'] / 100) ?></td>
+		<td><?php echo number_format($monster->jexp * $server->expRates['Job'] / 100) ?></td>
 		<?php if ($monster->dropcard_id): ?>
 			<td>
 				<?php if ($auth->actionAllowed('item', 'view')): ?>
